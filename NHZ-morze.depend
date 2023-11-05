@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1697957798 source:c:\users\szeke\desktop\iskola\progal\test\nhz-morze\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<string.h>
+	"../../../../../Downloads/debugmalloc.h"
+
+1697649046 c:\users\szeke\downloads\debugmalloc.h
+	<stdbool.h>
+	<stddef.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<string.h>
+	<stdarg.h>
+	<process.h>
+	<unistd.h>
+

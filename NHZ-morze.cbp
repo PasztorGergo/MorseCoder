@@ -31,6 +31,8 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="../../../../../Downloads/debugmalloc.h" />
+		<Unit filename="alphabet.txt" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
