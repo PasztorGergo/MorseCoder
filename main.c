@@ -40,8 +40,9 @@ char* hosszu_sort_olvas(){
 
     return tomb;
 }
+
 char* Convert(char* source, char* input, bool isTextToMorse);
-kod* ReadCharset(char *path);
+kod* ReadCharset(char *path, int* size);
 /*
         Todo:
         - Text to morse converter
@@ -58,6 +59,8 @@ int main()
     char *input;
     char *path;
     kod *abc = NULL;
+    int meret = 0;
+    int *mp = &meret;
 
     printf("			___\n_-||-_		       \\   /\n|----|_--___---__I_#_--|   |\n|    |__I____|*|_______|___/\n|----|  |*|   @       |\n|_______|-|__________/\n/_______________#____\\\n\n\n");
     printf("Morze kodolo %s\nValasszon milyen muveletet szeretne vegrehajtani es irja le a sorszamat\n0. Forditas iranyanak megvaltoztatasa\n1. Bemenet megadasa\n2. Karakterkeszlet megadasa\n3. Kilépés a programból\n", isTextToMorse ? "(Szöveg -> Morze)" : "(Morze -> Szöveg)");
@@ -76,14 +79,23 @@ int main()
             free(input);
             break;
         case 2:
+            if(abc != NULL){
+                for(int i = 0; i < *mp-1; i++)
+                    free(abc[i].morse);
+                free(abc);
+            }
             path = hosszu_sort_olvas();
             if(abc != NULL)
                 free(abc);
             
-            abc = ReadCharset(path);
+            abc = ReadCharset(path, mp);
             free(path);
+            for(int i = 0; i < *mp-1; i++)
+                printf("%c\t%s",abc[i].character, abc[i].morse);
             break;
         case 3:
+            for(int i = 0; i < *mp-1; i++)
+                free(abc[i].morse);
             free(abc);
             exit(1);
             break;
@@ -96,7 +108,7 @@ int main()
     return 0;
 }
 
-kod* ReadCharset(char *path){
+kod* ReadCharset(char *path, int* size){
     FILE* fp;
     kod *alphabet;
     int meret = 0;
@@ -121,13 +133,15 @@ kod* ReadCharset(char *path){
                     alphabet[i] = temp[i];
                 }
 
+                alphabet[meret-1].morse = (char*) malloc(sizeof(char) * (strlen(sor) - strlen("A\t")));
+
                 sscanf(sor,"%c\t%s", alphabet[meret - 1].character, alphabet[meret - 1].morse);
-                //printf("%c\t%s", alphabet[meret - 1].character, alphabet[meret - 1].morse);
             }
             meret++;
         }
     }
     fclose(fp);
+    *size = meret;
     return alphabet;
 }
 char* Convert(char *source, char *input, bool isTextToMorse){
