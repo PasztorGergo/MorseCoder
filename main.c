@@ -41,7 +41,8 @@ char* hosszu_sort_olvas(){
     return tomb;
 }
 
-char* Convert(char* source, char* input, bool isTextToMorse);
+char* Encode(kod* source, int size, char input);
+char* Convert(kod* source, int size,char* input, bool isTextToMorse);
 kod* ReadCharset(char *path, int* size);
 /*
         Todo:
@@ -76,17 +77,16 @@ int main()
             printf("Adja meg a %s szoveget:\n", isTextToMorse ? "kodolando" : "dekodolando");
             input = hosszu_sort_olvas();
             printf("\nA bemenet:%s\n", input);
+            Convert(abc, *mp, input, isTextToMorse);
             free(input);
             break;
         case 2:
             if(abc != NULL){
-                for(int i = 0; i < *mp-1; i++)
+                for(int i = 0; i < *(mp)-1; i++)
                     free(abc[i].morse);
                 free(abc);
             }
             path = hosszu_sort_olvas();
-            if(abc != NULL)
-                free(abc);
             
             abc = ReadCharset(path, mp);
             free(path);
@@ -144,9 +144,20 @@ kod* ReadCharset(char *path, int* size){
     *size = meret;
     return alphabet;
 }
-char* Convert(char *source, char *input, bool isTextToMorse){
-    if(isTextToMorse){
 
+char* Encode(kod *source, int size, char input){
+    for(int i = 0; i < size; i++){
+        if(source[i].character == input)
+            return source[i].morse;
+    }
+}
+
+char* Convert(kod *source, char *input, bool isTextToMorse){
+    char* output;
+    if(isTextToMorse){
+        for(int i = 0; input[i] != '\0'; i++){
+
+        }
     }else{
 
     }
