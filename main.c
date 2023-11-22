@@ -4,6 +4,8 @@
 #include <string.h>
 #include "../../../../../Downloads/debugmalloc.h"
 
+#define MAX_LINE_LENGTH 256
+
 typedef struct
 {
     char character;
@@ -41,8 +43,72 @@ char* hosszu_sort_olvas(){
     return tomb;
 }
 
-char* Encode(kod* source, int size, char input);
-char* Convert(kod* source, int size,char* input, bool isTextToMorse);
+kod* abc_realloc(int meret, kod* alphabet){
+    kod temp[meret] = {};
+    for(int i = 0; i < meret-1; i++){
+            temp[i] = alphabet[i];
+    }
+
+    meret++;
+    free(alphabet);
+    alphabet = (kod*) malloc(meret * sizeof(kod));
+
+    for(int i = 0; i < meret-1; i++){
+            alphabet[i] = temp[i];
+    }
+
+    return alphabet;
+}
+
+char** splitString(const char* str, char split_char) {
+    char** result = (char**)malloc(2 * sizeof(char*));
+
+    if (result == NULL) {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Find the position of the split character
+    const char* split_position = strchr(str, split_char);
+
+    if (split_position == NULL) {
+        // If the split character is not found, return the whole string as the first part
+        result[0] = strdup(str);
+        result[1] = NULL; // The second part is NULL
+    } else {
+        // Calculate the lengths of the two parts
+        size_t first_part_length = split_position - str;
+        size_t second_part_length = strlen(split_position + 1);
+
+        // Allocate memory for the first part
+        result[0] = (char*)malloc((first_part_length + 1) * sizeof(char));
+
+        if (result[0] == NULL) {
+            perror("Memory allocation failed");
+            exit(EXIT_FAILURE);
+        }
+
+        // Copy the first part to the allocated memory
+        strncpy(result[0], str, first_part_length);
+        result[0][first_part_length] = '\0'; // Null-terminate the string
+
+        // Allocate memory for the second part
+        result[1] = (char*)malloc((second_part_length + 1) * sizeof(char));
+
+        if (result[1] == NULL) {
+            perror("Memory allocation failed");
+            exit(EXIT_FAILURE);
+        }
+
+        // Copy the second part to the allocated memory
+        strcpy(result[1], split_position + 1);
+    }
+
+    return result;
+}
+
+char* Encode(kod* source, char input, int size);
+char* Convert(kod* source, int size, char* input, bool isTextToMorse);
 kod* ReadCharset(char *path, int* size);
 /*
         Todo:
@@ -77,7 +143,9 @@ int main()
             printf("Adja meg a %s szoveget:\n", isTextToMorse ? "kodolando" : "dekodolando");
             input = hosszu_sort_olvas();
             printf("\nA bemenet:%s\n", input);
-            Convert(abc, *mp, input, isTextToMorse);
+            char* output = Convert(abc, *mp, input, isTextToMorse);
+            printf("A kiemenet: %s", output);
+            free(output);
             free(input);
             break;
         case 2:
@@ -91,7 +159,7 @@ int main()
             abc = ReadCharset(path, mp);
             free(path);
             for(int i = 0; i < *mp-1; i++)
-                printf("%c\t%s",abc[i].character, abc[i].morse);
+               printf("%c\t%s\n",abc[i].character, abc[i].morse);
             break;
         case 3:
             for(int i = 0; i < *mp-1; i++)
@@ -113,54 +181,47 @@ kod* ReadCharset(char *path, int* size){
     kod *alphabet;
     int meret = 0;
     alphabet = (kod*) malloc(meret * sizeof(kod));
-    char sor[101];
+    char* sor;
+    sor = (char*) malloc(sizeof(char) * MAX_LINE_LENGTH);
 
     fp = fopen(path,"r");
-    while(fgets(sor,101,fp)){
-        if(sor != ""){
-            printf("%s", sor);
-            if(meret > 0){
-                kod temp[meret] = {};
+    while(fgets(sor, MAX_LINE_LENGTH,fp) != NULL){
+        kod temp[meret];
 
-                for(int i = 0; i < meret-1; i++){
-                    temp[i] = alphabet[i];
-                }
+        meret++;
+        alphabet = (meret, alphabet);
 
-                free(alphabet);
-                alphabet = (kod*) malloc(meret * sizeof(kod));
-
-                for(int i = 0; i < meret; i++){
-                    alphabet[i] = temp[i];
-                }
-
-                alphabet[meret-1].morse = (char*) malloc(sizeof(char) * (strlen(sor) - strlen("A\t")));
-
-                sscanf(sor,"%c\t%s", alphabet[meret - 1].character, alphabet[meret - 1].morse);
-            }
-            meret++;
-        }
+        alphabet[meret-1].morse = (char*) malloc(sizeof(char) * MAX_LINE_LENGTH);
+        sscanf("%c\t%s", &(alphabet[meret-1].character), alphabet[meret-1].morse);
     }
+    free(sor);
     fclose(fp);
     *size = meret;
     return alphabet;
 }
 
-char* Encode(kod *source, int size, char input){
+char* Encode(kod *source, char input, int size){
     for(int i = 0; i < size; i++){
         if(source[i].character == input)
             return source[i].morse;
     }
+    return NULL;
 }
 
-char* Convert(kod *source, char *input, bool isTextToMorse){
+char* Convert(kod *source, int size, char *input, bool isTextToMorse){
     char* output;
     if(isTextToMorse){
         for(int i = 0; input[i] != '\0'; i++){
-
+            char* encoded_char = Encode(source, input[i], size);
+            output = (char*) malloc((sizeof(output) + sizeof(encoded_char) + 2) * sizeof(char));
+            strcpy(output, encoded_char);
+            if(input[i+1] != '\0')
+                strcat(output,"/");
         }
     }else{
 
     }
+    return output;
     //Replace chars from the beginning with their morse counterpart
         //Using two arrays for the chars and search for their encoded version
         //Creating an array of a custom type containing the letter and the coded form
