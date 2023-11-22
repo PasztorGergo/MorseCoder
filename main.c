@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "../../../../../Downloads/debugmalloc.h"
 
 #define MAX_LINE_LENGTH 256
 
@@ -115,9 +114,8 @@ kod* ReadCharset(char *path, int* size);
         - Text to morse converter
         - Morse to text converter
         - Switch for the two mentioned above (Done)
-        - Adding charset
+        - Adding charset(Done)
         - Create a menu that offers 4 options (the previous 4 requirements) (Done)
-        - When choosing the input option clear the console for better visibility
     */
 int main()
 {
